@@ -5,20 +5,32 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 
 import component.Button;
 import component.IconButton;
@@ -37,9 +49,23 @@ public class MenuFrame extends JFrame {
     createLoginScene();
     createMenuScene();
 
+    setIconImage(new ImageIcon(Main.RESOURCES_PATH + "/icon.png").getImage());
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-    setResizable(false);
     setVisible(true);
+
+    addWindowListener(new WindowAdapter() {
+      public void windowClosed(WindowEvent e) {
+        String showOnStart = "";
+        for (Note note : Main.notes) {
+          if (note.isFavorite()) {
+            showOnStart += note.getId() + ",";
+          }
+        }
+        Main.config.setProperty("show-on-start",
+            showOnStart.length() > 0 ? showOnStart.substring(0, showOnStart.length() - 1) : showOnStart);
+        Main.saveConfig();
+      }
+    });
   }
 
   // Crear login -----------------------------------------
@@ -174,7 +200,7 @@ public class MenuFrame extends JFrame {
         Note note = Main.service.newNote();
         Main.notes = Arrays.copyOf(Main.notes, Main.notes.length + 1);
         Main.notes[Main.notes.length - 1] = note;
-        Main.showNote(note.getId());
+        Main.showNote(note);
         update();
       } else {
         Main.service.cleanTrash();
@@ -224,10 +250,17 @@ public class MenuFrame extends JFrame {
     gridPanel.removeAll();
 
     Dimension noteSize = new Dimension(260, 314);
+    int keyStrokeIndex = -1;
+    JRootPane root = getRootPane();
+    InputMap InputMap = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    ActionMap actionMap = root.getActionMap();
+
     for (int i = 0; i < Main.notes.length; i++) {
       Note note = Main.notes[i];
       if (note == null || note.getOnTrash() == !showingTrash)
         continue;
+
+      Color color = note.parseColor();
 
       JPanel notePanel = new JPanel(new BorderLayout(0, 8));
       notePanel.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
@@ -250,7 +283,7 @@ public class MenuFrame extends JFrame {
       noteHeader.add(buttonPanel, BorderLayout.EAST);
 
       if (showingTrash) {
-        IconButton restore = new IconButton("󰦛", Color.BLACK, note.parseColor());
+        IconButton restore = new IconButton("󰦛", Color.BLACK, color);
         restore.addActionListener(e -> {
           Main.service.restore(note.getId());
           note.setOnTrash(false);
@@ -260,15 +293,29 @@ public class MenuFrame extends JFrame {
         buttonPanel.add(restore);
 
         final int finalI = i;
-        IconButton remove = new IconButton("", Main.DANGER_COLOR, note.parseColor());
+        IconButton remove = new IconButton("", Main.DANGER_COLOR, color);
         remove.addActionListener(e -> {
           Main.service.remove(note.getId());
+          Main.notes[finalI].getFrame().dispose();
           Main.notes[finalI] = null;
           update();
         });
         buttonPanel.add(remove);
       } else {
-        IconButton trash = new IconButton("", Main.DANGER_COLOR, note.parseColor());
+        IconButton favorite = new IconButton(note.isFavorite() ? "" : "", Color.BLACK, color);
+        favorite.addActionListener(e -> {
+          if (note.isFavorite()) {
+            note.setFavorite(false);
+            favorite.setText("");
+          } else {
+            note.setFavorite(true);
+            favorite.setText("");
+          }
+          favorite.repaint();
+        });
+        buttonPanel.add(favorite);
+
+        IconButton trash = new IconButton("", Main.DANGER_COLOR, color);
         trash.addActionListener(e -> {
           Main.service.trash(note.getId());
           note.setOnTrash(true);
@@ -288,17 +335,41 @@ public class MenuFrame extends JFrame {
 
       Label date = new Label(note.getDate().toString(), 6);
       date.setForeground(Main.MUTED_COLOR);
-      notePanel.add(date, BorderLayout.SOUTH);
+
+      if (!showingTrash) {
+        keyStrokeIndex++;
+
+        InputMap.put(
+            KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar(KeyEvent.VK_0 + keyStrokeIndex),
+                InputEvent.CTRL_DOWN_MASK),
+            keyStrokeIndex);
+        actionMap.put(keyStrokeIndex, new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            Main.showNote(note);
+          }
+        });
+
+        JPanel bottomPane = new JPanel(new BorderLayout());
+        bottomPane.setBackground(null);
+        notePanel.add(bottomPane, BorderLayout.SOUTH);
+        bottomPane.add(date, BorderLayout.WEST);
+
+        Label keyStroke = new Label("Ctrl + " + keyStrokeIndex, 6);
+        keyStroke.setForeground(Main.MUTED_COLOR);
+        bottomPane.add(keyStroke, BorderLayout.EAST);
+      } else {
+        notePanel.add(date, BorderLayout.SOUTH);
+      }
 
       if (!note.getOnTrash()) {
         notePanel.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
-            Main.showNote(note.getId());
+            Main.showNote(note);
           }
         });
         body.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
-            Main.showNote(note.getId());
+            Main.showNote(note);
           }
         });
       }
@@ -309,6 +380,8 @@ public class MenuFrame extends JFrame {
   }
 
   public void showLogin() {
+    Main.stopLoop();
+
     getContentPane().removeAll();
     add(mainLoginPanel);
     revalidate();

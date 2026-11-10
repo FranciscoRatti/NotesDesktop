@@ -1,6 +1,7 @@
 package note;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,6 +73,28 @@ public class Note {
     return color;
   }
 
+  private boolean onTrash;
+
+  public void setOnTrash(boolean onTrash) {
+    this.onTrash = onTrash;
+  }
+
+  public boolean getOnTrash() {
+    return onTrash;
+  }
+
+  private LocalDate trashDate;
+
+  public void setTrashDate(LocalDate trashDate) {
+    this.trashDate = trashDate;
+  }
+
+  public LocalDate getTrashDate() {
+    return trashDate;
+  }
+
+  // Ignoradas ----------------------------------------------------------
+
   @JsonIgnore
   public Color parseColor() {
     return new Color(
@@ -120,24 +143,24 @@ public class Note {
     }
   }
 
-  private boolean onTrash;
-
-  public void setOnTrash(boolean onTrash) {
-    this.onTrash = onTrash;
-  }
-
-  public boolean getOnTrash() {
-    return onTrash;
-  }
-
-  private LocalDate trashDate;
-
-  public void setTrashDate(LocalDate trashDate) {
-    this.trashDate = trashDate;
-  }
-
-  public LocalDate getTrashDate() {
-    return trashDate;
+  @JsonIgnore
+  public static String parseDecimalNumber(int n) {
+    switch (n) {
+      case 10:
+        return "a";
+      case 11:
+        return "b";
+      case 12:
+        return "c";
+      case 13:
+        return "d";
+      case 14:
+        return "e";
+      case 15:
+        return "f";
+      default:
+        return String.valueOf(n);
+    }
   }
 
   @JsonIgnore
@@ -150,5 +173,29 @@ public class Note {
   @JsonIgnore
   public NoteFrame getFrame() {
     return frame;
+  }
+
+  @JsonIgnore
+  private boolean favorite;
+
+  public void setFavorite(boolean favorite) {
+    this.favorite = favorite;
+  }
+
+  @JsonIgnore
+  public boolean isFavorite() {
+    return favorite;
+  }
+
+  @JsonIgnore
+  private Rectangle bounds;
+
+  public void setBounds(Rectangle bounds) {
+    this.bounds = bounds;
+  }
+
+  @JsonIgnore
+  public Rectangle getBounds() {
+    return bounds;
   }
 }
