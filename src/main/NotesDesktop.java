@@ -26,7 +26,7 @@ import frame.NoteFrame;
 import note.Note;
 import note.NotesService;
 
-public class Main {
+public class NotesDesktop {
 
   // Objetos
   public volatile static Note[] notes;
@@ -213,7 +213,7 @@ public class Main {
             note.setTitle(frame.getTitle());
             note.setBody(frame.getBody());
             note.setColor(frame.getColor());
-            Main.service.update(note);
+            NotesDesktop.service.update(note);
           }
         }
       }
@@ -345,9 +345,13 @@ public class Main {
   // Constantes ------------------------------------------------------------
 
   public static final String HOME = System.getenv("HOME");
-  public static final String CONFIG_PATH = HOME + "/Documents/Programacion/Proyectos/NotesDesktop/resources";
+  // public static final String CONFIG_PATH = HOME +
+  // "/Documents/Programacion/Proyectos/NotesDesktop/resources";
+  public static final String CONFIG_PATH = HOME + "/.config/notesdesktop";
+  // public static final String NOTES_PATH = HOME + "/.notes";
   public static final String NOTES_PATH = HOME + "/.notes";
-  public static final String RESOURCES_PATH = CONFIG_PATH;
+  // public static final String RESOURCES_PATH = CONFIG_PATH;
+  public static final String RESOURCES_PATH = "/usr/share/notesdesktop";
 
   public static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
   public static final Dimension MIDLE_SCREEN = new Dimension(SCREEN_SIZE.width / 2, SCREEN_SIZE.height / 2);

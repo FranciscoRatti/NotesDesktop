@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Notes Desktop
+Comment=Notas creado por el mejor programador
+Exec=java -jar /usr/lib/notesdesktop/NotesDesktop.jar
+Icon=/usr/share/notesdesktop/icon.png
+Type=Application
+Categories=Office;Utility;
+Terminal=false
+Keywords=notas;notes;
+StartupNotify=false
+StartupWMClass=main.NotesDesktop

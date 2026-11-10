@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.border.Border;
 
-import main.Main;
+import main.NotesDesktop;
 
 public class IconButton extends JButton {
   private Border lineBorder;
@@ -24,7 +24,7 @@ public class IconButton extends JButton {
     setForeground(foreground);
     setBackground(null);
     setBorder(lineBorder);
-    setFont(Main.NERD_FONT);
+    setFont(NotesDesktop.NERD_FONT);
 
     setBorder(BorderFactory.createCompoundBorder(lineBorder, padding));
     addMouseListener(new MouseAdapter() {

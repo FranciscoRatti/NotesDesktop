@@ -12,18 +12,18 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.border.Border;
 
-import main.Main;
+import main.NotesDesktop;
 
 public class Button extends JButton {
-  private Border lineBorder = BorderFactory.createLineBorder(Main.BUTTON_COLOR, 1, true);
+  private Border lineBorder = BorderFactory.createLineBorder(NotesDesktop.BUTTON_COLOR, 1, true);
   private Border focusLineBorder = BorderFactory.createLineBorder(Color.WHITE, 1, true);
   private Border padding = BorderFactory.createEmptyBorder(5, 6, 5, 6);
 
   public Button(String text, ActionListener action) {
     super(text);
     setAlignmentX(Component.CENTER_ALIGNMENT);
-    setFont(Main.BUTTON_FONT);
-    setBackground(Main.BUTTON_COLOR);
+    setFont(NotesDesktop.BUTTON_FONT);
+    setBackground(NotesDesktop.BUTTON_COLOR);
     setForeground(Color.WHITE);
     addActionListener(action);
 

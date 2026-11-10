@@ -28,7 +28,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 
 import component.MenuItem;
-import main.Main;
+import main.NotesDesktop;
 import note.Note;
 
 public class NoteFrame extends JFrame {
@@ -51,7 +51,7 @@ public class NoteFrame extends JFrame {
 
     title = new JTextField(note.getTitle());
     title.setBorder(BorderFactory.createEmptyBorder(10, 14, 0, 14));
-    title.setFont(Main.TITLE_FONT.deriveFont(this.fontSize + 4));
+    title.setFont(NotesDesktop.TITLE_FONT.deriveFont(this.fontSize + 4));
     title.setForeground(Color.BLACK);
     title.setBackground(null);
     title.addKeyListener(new KeyAdapter() {
@@ -68,7 +68,7 @@ public class NoteFrame extends JFrame {
     body.setWrapStyleWord(true);
     body.setTabSize(2);
     body.setMargin(new Insets(4, 10, 12, 10));
-    body.setFont(Main.BODY_FONT.deriveFont(this.fontSize));
+    body.setFont(NotesDesktop.BODY_FONT.deriveFont(this.fontSize));
     body.setForeground(Color.BLACK);
     body.setBackground(null);
     body.addKeyListener(new KeyAdapter() {
@@ -81,7 +81,7 @@ public class NoteFrame extends JFrame {
     pane.add(body, BorderLayout.CENTER);
 
     setBounds(bounds);
-    setIconImage(new ImageIcon(Main.RESOURCES_PATH + "/icon.png").getImage());
+    setIconImage(new ImageIcon(NotesDesktop.RESOURCES_PATH + "/icon.png").getImage());
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setVisible(true);
 
@@ -92,7 +92,7 @@ public class NoteFrame extends JFrame {
     body.setComponentPopupMenu(popup);
 
     MenuItem openMenu = new MenuItem("Abrir menu", e -> {
-      Main.showMenu(false);
+      NotesDesktop.showMenu(false);
     });
     popup.add(openMenu);
 
@@ -114,16 +114,16 @@ public class NoteFrame extends JFrame {
 
     MenuItem changeFontSize = new MenuItem("Cambiar tamaño de fuente", e -> {
       JSpinner spinner = new JSpinner();
-      spinner.setFont(Main.BODY_FONT.deriveFont(getFontSize()));
+      spinner.setFont(NotesDesktop.BODY_FONT.deriveFont(getFontSize()));
       spinner.setModel(new SpinnerNumberModel(Math.round(getFontSize()), 0, 30, 1));
       spinner.addChangeListener(
-          ev -> spinner.setFont(Main.BODY_FONT.deriveFont((int) spinner.getValue())));
+          ev -> spinner.setFont(NotesDesktop.BODY_FONT.deriveFont((int) spinner.getValue())));
 
       if (JOptionPane.showConfirmDialog(this, spinner, "Cambiar tamaño de letra", JOptionPane.OK_CANCEL_OPTION,
           JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
         setFontSize((int) spinner.getValue());
-        title.setFont(Main.TITLE_FONT.deriveFont(getFontSize() + 4));
-        body.setFont(Main.BODY_FONT.deriveFont(getFontSize()));
+        title.setFont(NotesDesktop.TITLE_FONT.deriveFont(getFontSize() + 4));
+        body.setFont(NotesDesktop.BODY_FONT.deriveFont(getFontSize()));
       }
     });
     popup.add(changeFontSize);
@@ -134,7 +134,7 @@ public class NoteFrame extends JFrame {
     ActionMap actionMap = root.getActionMap();
     actionMap.put("openMenu", new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
-        Main.showMenu(false);
+        NotesDesktop.showMenu(false);
       }
     });
   }

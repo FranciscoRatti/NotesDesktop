@@ -2,7 +2,7 @@ package note;
 
 import java.io.IOException;
 
-import main.Main;
+import main.NotesDesktop;
 
 public class NotesService {
   public NotesService() {
@@ -14,7 +14,7 @@ public class NotesService {
       Process process = sendRequest("GET", "/api/notes/all", null);
       String result = new String(process.getInputStream().readAllBytes());
       process.waitFor();
-      return Main.mapper.readValue(result, Note[].class);
+      return NotesDesktop.mapper.readValue(result, Note[].class);
     } catch (InterruptedException | IOException e) {
       return null;
     }
@@ -23,7 +23,7 @@ public class NotesService {
   public Note byId(long id) {
     try {
       Process process = sendRequest("GET", "/api/notes/" + id, null);
-      Note result = Main.mapper.readValue(process.getInputStream(), Note.class);
+      Note result = NotesDesktop.mapper.readValue(process.getInputStream(), Note.class);
       process.waitFor();
       return result;
     } catch (InterruptedException | IOException e) {
@@ -37,7 +37,7 @@ public class NotesService {
       Process process = sendRequest("PUT", "/api/notes/new", new NoteDTO());
       String result = new String(process.getInputStream().readAllBytes());
       process.waitFor();
-      return Main.mapper.readValue(result, Note.class);
+      return NotesDesktop.mapper.readValue(result, Note.class);
     } catch (InterruptedException | IOException e) {
       System.out.println("Error al crear nueva nota");
       return null;
@@ -102,12 +102,12 @@ public class NotesService {
   private Process sendRequest(String method, String url, NoteDTO note) throws IOException {
     ProcessBuilder pb;
     if (note == null) {
-      pb = new ProcessBuilder("curl", "-sk", "-X", method, "-u", Main.USERNAME + ":" + Main.PASSWORD,
-          Main.URL + url);
+      pb = new ProcessBuilder("curl", "-sk", "-X", method, "-u", NotesDesktop.USERNAME + ":" + NotesDesktop.PASSWORD,
+          NotesDesktop.URL + url);
     } else {
-      String toString = Main.mapper.writeValueAsString(note);
-      pb = new ProcessBuilder("curl", "-sk", "-X", method, "-u", Main.USERNAME + ":" + Main.PASSWORD,
-          Main.URL + url, "-H", "Content-Type: application/json", "-d", toString);
+      String toString = NotesDesktop.mapper.writeValueAsString(note);
+      pb = new ProcessBuilder("curl", "-sk", "-X", method, "-u", NotesDesktop.USERNAME + ":" + NotesDesktop.PASSWORD,
+          NotesDesktop.URL + url, "-H", "Content-Type: application/json", "-d", toString);
     }
 
     pb.redirectErrorStream(true);

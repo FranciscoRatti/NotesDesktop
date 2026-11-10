@@ -37,7 +37,7 @@ import component.IconButton;
 import component.Label;
 import component.Link;
 import component.TextField;
-import main.Main;
+import main.NotesDesktop;
 import note.Note;
 
 public class MenuFrame extends JFrame {
@@ -49,21 +49,21 @@ public class MenuFrame extends JFrame {
     createLoginScene();
     createMenuScene();
 
-    setIconImage(new ImageIcon(Main.RESOURCES_PATH + "/icon.png").getImage());
+    setIconImage(new ImageIcon(NotesDesktop.RESOURCES_PATH + "/icon.png").getImage());
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setVisible(true);
 
     addWindowListener(new WindowAdapter() {
       public void windowClosed(WindowEvent e) {
         String showOnStart = "";
-        for (Note note : Main.notes) {
+        for (Note note : NotesDesktop.notes) {
           if (note.isFavorite()) {
             showOnStart += note.getId() + ",";
           }
         }
-        Main.config.setProperty("show-on-start",
+        NotesDesktop.config.setProperty("show-on-start",
             showOnStart.length() > 0 ? showOnStart.substring(0, showOnStart.length() - 1) : showOnStart);
-        Main.saveConfig();
+        NotesDesktop.saveConfig();
       }
     });
   }
@@ -71,10 +71,10 @@ public class MenuFrame extends JFrame {
   // Crear login -----------------------------------------
 
   private void createLoginScene() {
-    mainLoginPanel.setBackground(Main.BACKGROUND_COLOR);
+    mainLoginPanel.setBackground(NotesDesktop.BACKGROUND_COLOR);
 
     JPanel loginPane = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 15));
-    loginPane.setBackground(Main.HEADER_COLOR);
+    loginPane.setBackground(NotesDesktop.HEADER_COLOR);
     mainLoginPanel.add(loginPane);
 
     Box loginBox = Box.createVerticalBox();
@@ -86,39 +86,40 @@ public class MenuFrame extends JFrame {
     loginBox.add(Box.createVerticalStrut(11));
 
     Label urlError = new Label(null, 6);
-    urlError.setForeground(Main.DANGER_COLOR);
+    urlError.setForeground(NotesDesktop.DANGER_COLOR);
     loginBox.add(urlError);
 
     Label credentialError = new Label(null, 6);
-    credentialError.setForeground(Main.DANGER_COLOR);
+    credentialError.setForeground(NotesDesktop.DANGER_COLOR);
     loginBox.add(credentialError);
 
     Label warning = new Label(null, 6);
-    warning.setForeground(Main.ALERT_COLOR);
+    warning.setForeground(NotesDesktop.ALERT_COLOR);
     loginBox.add(warning);
 
     loginBox.add(Box.createVerticalStrut(10));
 
-    TextField url = new TextField("Direccion del servidor", (String) Main.config.getOrDefault("url", ""), 1);
+    TextField url = new TextField("Direccion del servidor", (String) NotesDesktop.config.getOrDefault("url", ""), 1);
     loginBox.add(url);
 
     loginBox.add(Box.createVerticalStrut(10));
 
-    TextField username = new TextField("Email o usuario", (String) Main.config.getOrDefault("username", null), 20);
+    TextField username = new TextField("Email o usuario", (String) NotesDesktop.config.getOrDefault("username", null),
+        20);
     loginBox.add(username);
 
     loginBox.add(Box.createVerticalStrut(10));
 
     JPasswordField password = new JPasswordField(20);
-    String passwordText = Main.config.getProperty("password");
+    String passwordText = NotesDesktop.config.getProperty("password");
     if (passwordText == null || passwordText.isEmpty()) {
       password.setText("Contraseña");
-      password.setForeground(Main.MUTED_COLOR);
+      password.setForeground(NotesDesktop.MUTED_COLOR);
     } else {
       password.setText(passwordText);
       password.setForeground(Color.BLACK);
     }
-    password.setFont(Main.FIELD_FONT);
+    password.setFont(NotesDesktop.FIELD_FONT);
     password.setBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
     password.addFocusListener(new FocusAdapter() {
       public void focusGained(FocusEvent e) {
@@ -131,7 +132,7 @@ public class MenuFrame extends JFrame {
       public void focusLost(FocusEvent e) {
         if (password.getPassword() == null || password.getPassword().length == 0) {
           password.setText("Contraseña");
-          password.setForeground(Main.MUTED_COLOR);
+          password.setForeground(NotesDesktop.MUTED_COLOR);
         }
       }
     });
@@ -145,9 +146,9 @@ public class MenuFrame extends JFrame {
       urlError.setText(null);
       warning.setText(null);
 
-      Main.URL = url.getText();
+      NotesDesktop.URL = url.getText();
       try {
-        if (new ProcessBuilder("curl", "-k", Main.URL + "/").start().waitFor() != 0) {
+        if (new ProcessBuilder("curl", "-k", NotesDesktop.URL + "/").start().waitFor() != 0) {
           urlError.setText("La direccion no esta asociada a ningun servidor");
           hasError = true;
         }
@@ -155,23 +156,23 @@ public class MenuFrame extends JFrame {
         urlError.setText("La direccion es incorrecta");
       }
 
-      Main.USERNAME = username.getText();
-      Main.PASSWORD = new String(password.getPassword());
-      Main.notes = Main.service.all();
-      if (Main.notes == null) {
+      NotesDesktop.USERNAME = username.getText();
+      NotesDesktop.PASSWORD = new String(password.getPassword());
+      NotesDesktop.notes = NotesDesktop.service.all();
+      if (NotesDesktop.notes == null) {
         credentialError.setText("Usuario o contraseña incorrectas");
         hasError = true;
       }
 
       if (!hasError) {
-        Main.config.setProperty("url", Main.URL);
-        Main.config.setProperty("username", Main.USERNAME);
-        Main.config.setProperty("password", Main.PASSWORD);
-        Main.saveConfig();
+        NotesDesktop.config.setProperty("url", NotesDesktop.URL);
+        NotesDesktop.config.setProperty("username", NotesDesktop.USERNAME);
+        NotesDesktop.config.setProperty("password", NotesDesktop.PASSWORD);
+        NotesDesktop.saveConfig();
 
-        Main.notes = Main.service.all();
+        NotesDesktop.notes = NotesDesktop.service.all();
         showNotes();
-        Main.startLoop();
+        NotesDesktop.startLoop();
       }
     });
     send.setPaddin(5, 120, 5, 120);
@@ -188,23 +189,23 @@ public class MenuFrame extends JFrame {
 
   private void createMenuScene() {
     header = new JPanel(new BorderLayout(20, 20));
-    header.setBackground(Main.HEADER_COLOR);
+    header.setBackground(NotesDesktop.HEADER_COLOR);
     mainMenuPanel.add(header, BorderLayout.NORTH);
 
     JPanel leftHeader = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-    leftHeader.setBackground(Main.HEADER_COLOR);
+    leftHeader.setBackground(NotesDesktop.HEADER_COLOR);
     header.add(leftHeader, BorderLayout.WEST);
 
     newNote = new Button("+ Nueva nota", e -> {
       if (!showingTrash) {
-        Note note = Main.service.newNote();
-        Main.notes = Arrays.copyOf(Main.notes, Main.notes.length + 1);
-        Main.notes[Main.notes.length - 1] = note;
-        Main.showNote(note);
+        Note note = NotesDesktop.service.newNote();
+        NotesDesktop.notes = Arrays.copyOf(NotesDesktop.notes, NotesDesktop.notes.length + 1);
+        NotesDesktop.notes[NotesDesktop.notes.length - 1] = note;
+        NotesDesktop.showNote(note);
         update();
       } else {
-        Main.service.cleanTrash();
-        for (Note note : Main.notes) {
+        NotesDesktop.service.cleanTrash();
+        for (Note note : NotesDesktop.notes) {
           if (note.getOnTrash()) {
             note = null;
           }
@@ -223,7 +224,7 @@ public class MenuFrame extends JFrame {
     leftHeader.add(newNote);
 
     JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-    rightHeader.setBackground(Main.HEADER_COLOR);
+    rightHeader.setBackground(NotesDesktop.HEADER_COLOR);
     header.add(rightHeader, BorderLayout.EAST);
 
     Link logout = new Link("Cambiar de usuario", e -> {
@@ -232,7 +233,7 @@ public class MenuFrame extends JFrame {
     rightHeader.add(logout);
 
     JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-    panel.setBackground(Main.BACKGROUND_COLOR);
+    panel.setBackground(NotesDesktop.BACKGROUND_COLOR);
     JScrollPane scroll = new JScrollPane(panel);
     scroll.setBorder(null);
     mainMenuPanel.add(scroll, BorderLayout.CENTER);
@@ -255,8 +256,8 @@ public class MenuFrame extends JFrame {
     InputMap InputMap = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     ActionMap actionMap = root.getActionMap();
 
-    for (int i = 0; i < Main.notes.length; i++) {
-      Note note = Main.notes[i];
+    for (int i = 0; i < NotesDesktop.notes.length; i++) {
+      Note note = NotesDesktop.notes[i];
       if (note == null || note.getOnTrash() == !showingTrash)
         continue;
 
@@ -285,7 +286,7 @@ public class MenuFrame extends JFrame {
       if (showingTrash) {
         IconButton restore = new IconButton("󰦛", Color.BLACK, color);
         restore.addActionListener(e -> {
-          Main.service.restore(note.getId());
+          NotesDesktop.service.restore(note.getId());
           note.setOnTrash(false);
           note.setTrashDate(null);
           update();
@@ -293,11 +294,11 @@ public class MenuFrame extends JFrame {
         buttonPanel.add(restore);
 
         final int finalI = i;
-        IconButton remove = new IconButton("", Main.DANGER_COLOR, color);
+        IconButton remove = new IconButton("", NotesDesktop.DANGER_COLOR, color);
         remove.addActionListener(e -> {
-          Main.service.remove(note.getId());
-          Main.notes[finalI].getFrame().dispose();
-          Main.notes[finalI] = null;
+          NotesDesktop.service.remove(note.getId());
+          NotesDesktop.notes[finalI].getFrame().dispose();
+          NotesDesktop.notes[finalI] = null;
           update();
         });
         buttonPanel.add(remove);
@@ -315,9 +316,9 @@ public class MenuFrame extends JFrame {
         });
         buttonPanel.add(favorite);
 
-        IconButton trash = new IconButton("", Main.DANGER_COLOR, color);
+        IconButton trash = new IconButton("", NotesDesktop.DANGER_COLOR, color);
         trash.addActionListener(e -> {
-          Main.service.trash(note.getId());
+          NotesDesktop.service.trash(note.getId());
           note.setOnTrash(true);
           note.setTrashDate(LocalDate.now());
           update();
@@ -327,14 +328,14 @@ public class MenuFrame extends JFrame {
 
       JTextArea body = new JTextArea(note.getBody());
       body.setEditable(false);
-      body.setFont(Main.H5_FONT);
+      body.setFont(NotesDesktop.H5_FONT);
       body.setForeground(Color.BLACK);
       body.setBackground(null);
       body.setBorder(null);
       notePanel.add(body, BorderLayout.CENTER);
 
       Label date = new Label(note.getDate().toString(), 6);
-      date.setForeground(Main.MUTED_COLOR);
+      date.setForeground(NotesDesktop.MUTED_COLOR);
 
       if (!showingTrash) {
         keyStrokeIndex++;
@@ -345,7 +346,7 @@ public class MenuFrame extends JFrame {
             keyStrokeIndex);
         actionMap.put(keyStrokeIndex, new AbstractAction() {
           public void actionPerformed(ActionEvent e) {
-            Main.showNote(note);
+            NotesDesktop.showNote(note);
           }
         });
 
@@ -355,7 +356,7 @@ public class MenuFrame extends JFrame {
         bottomPane.add(date, BorderLayout.WEST);
 
         Label keyStroke = new Label("Ctrl + " + keyStrokeIndex, 6);
-        keyStroke.setForeground(Main.MUTED_COLOR);
+        keyStroke.setForeground(NotesDesktop.MUTED_COLOR);
         bottomPane.add(keyStroke, BorderLayout.EAST);
       } else {
         notePanel.add(date, BorderLayout.SOUTH);
@@ -364,12 +365,12 @@ public class MenuFrame extends JFrame {
       if (!note.getOnTrash()) {
         notePanel.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
-            Main.showNote(note);
+            NotesDesktop.showNote(note);
           }
         });
         body.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
-            Main.showNote(note);
+            NotesDesktop.showNote(note);
           }
         });
       }
@@ -380,14 +381,14 @@ public class MenuFrame extends JFrame {
   }
 
   public void showLogin() {
-    Main.stopLoop();
+    NotesDesktop.stopLoop();
 
     getContentPane().removeAll();
     add(mainLoginPanel);
     revalidate();
     repaint();
 
-    setBounds(Main.MIDLE_SCREEN.width - 200, Main.MIDLE_SCREEN.height - 190, 400, 380);
+    setBounds(NotesDesktop.MIDLE_SCREEN.width - 200, NotesDesktop.MIDLE_SCREEN.height - 190, 400, 380);
     setTitle("Iniciar sesion");
   }
 
@@ -398,7 +399,7 @@ public class MenuFrame extends JFrame {
     revalidate();
     repaint();
 
-    setBounds(Main.MIDLE_SCREEN.width - 600, Main.MIDLE_SCREEN.height - 350, 1200, 700);
+    setBounds(NotesDesktop.MIDLE_SCREEN.width - 600, NotesDesktop.MIDLE_SCREEN.height - 350, 1200, 700);
     setTitle("Mis notas");
   }
 

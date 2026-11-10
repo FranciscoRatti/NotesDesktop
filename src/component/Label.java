@@ -5,7 +5,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 
-import main.Main;
+import main.NotesDesktop;
 
 public class Label extends JLabel {
   public Label(String text, int h) {
@@ -18,22 +18,22 @@ public class Label extends JLabel {
 
     switch (h) {
       case 1:
-        setFont(Main.H1_FONT);
+        setFont(NotesDesktop.H1_FONT);
         break;
       case 2:
-        setFont(Main.H2_FONT);
+        setFont(NotesDesktop.H2_FONT);
         break;
       case 3:
-        setFont(Main.H3_FONT);
+        setFont(NotesDesktop.H3_FONT);
         break;
       case 4:
-        setFont(Main.H4_FONT);
+        setFont(NotesDesktop.H4_FONT);
         break;
       case 5:
-        setFont(Main.H5_FONT);
+        setFont(NotesDesktop.H5_FONT);
         break;
       default:
-        setFont(Main.H6_FONT);
+        setFont(NotesDesktop.H6_FONT);
     }
   }
 }
