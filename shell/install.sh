@@ -1,4 +1,5 @@
 sudo -v
+cd NotesDesktop
 
 # Config
 mkdir ~/.config/notesdesktop/
